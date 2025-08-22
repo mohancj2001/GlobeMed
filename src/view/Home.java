@@ -26,6 +26,7 @@ public class Home extends javax.swing.JFrame {
         SwingUtilities.updateComponentTreeUI(main_panel);
         HomeMenu = 1;
         applyTheme();
+        this.setTitle("GlobeMed Health Care");
     }
 
     private void applyTheme() {

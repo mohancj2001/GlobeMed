@@ -106,9 +106,9 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
-        btnClear.setBackground(new java.awt.Color(220, 38, 38));
+        btnClear.setBackground(new java.awt.Color(255, 255, 255));
         btnClear.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        btnClear.setForeground(new java.awt.Color(255, 255, 255));
+        btnClear.setForeground(new java.awt.Color(0, 0, 0));
         btnClear.setText("Clear");
         btnClear.setPreferredSize(new java.awt.Dimension(80, 26));
 

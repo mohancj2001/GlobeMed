@@ -5,6 +5,25 @@
 package view;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import java.awt.Dialog;
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Vector;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import model.MySQL;
 
 /**
  *
@@ -15,13 +34,17 @@ public class Patient extends javax.swing.JPanel {
     /**
      * Creates new form Patient
      */
+    private HashMap<String, String> genderMap = new HashMap<>();
+
     public Patient() {
         initComponents();
         applyTheme();
+        loadGender();
+        loadTable("", "", "", "", "");
     }
-    
-    private void applyTheme(){
-    jPanel1.putClientProperty(FlatClientProperties.STYLE, ""
+
+    private void applyTheme() {
+        jPanel1.putClientProperty(FlatClientProperties.STYLE, ""
                 + "background:#009688; arc:20;");
     }
 
@@ -40,52 +63,130 @@ public class Patient extends javax.swing.JPanel {
         jLabel9 = new javax.swing.JLabel();
         lastNameField = new javax.swing.JTextField();
         mobileField = new javax.swing.JTextField();
-        statusCombo = new javax.swing.JComboBox<>();
-        jLabel12 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        to_date_field = new com.toedter.calendar.JDateChooser();
         jLabel13 = new javax.swing.JLabel();
         emailField = new javax.swing.JTextField();
+        dob_date_field = new com.toedter.calendar.JDateChooser();
+        genderComboBox = new javax.swing.JComboBox<>();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        addressTextArea = new javax.swing.JTextArea();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jLabel16 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        patientTable = new javax.swing.JTable();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
         jPanel1.setBackground(new java.awt.Color(0, 150, 136));
 
         jLabel8.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setText("First  name");
 
         firstNameField.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-
-        jLabel9.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        jLabel9.setText("Last Name");
-
-        lastNameField.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-
-        mobileField.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-
-        statusCombo.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        statusCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jLabel12.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        jLabel12.setText("Status");
-
-        jLabel11.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        jLabel11.setText("Mobile ");
-
-        jLabel10.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        jLabel10.setText("Date Of Birth");
-
-        to_date_field.setBackground(new java.awt.Color(255, 255, 255));
-        to_date_field.setForeground(new java.awt.Color(0, 0, 0));
-        to_date_field.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                to_date_fieldPropertyChange(evt);
+        firstNameField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                firstNameFieldKeyReleased(evt);
             }
         });
 
+        jLabel9.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel9.setText("Last Name");
+
+        lastNameField.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        lastNameField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                lastNameFieldKeyReleased(evt);
+            }
+        });
+
+        mobileField.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        mobileField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                mobileFieldKeyReleased(evt);
+            }
+        });
+
+        jLabel11.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel11.setText("Mobile ");
+
+        jLabel10.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel10.setText("Date Of Birth");
+
         jLabel13.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel13.setForeground(new java.awt.Color(255, 255, 255));
         jLabel13.setText("Email");
 
         emailField.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        emailField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                emailFieldKeyReleased(evt);
+            }
+        });
+
+        dob_date_field.setBackground(new java.awt.Color(255, 255, 255));
+        dob_date_field.setForeground(new java.awt.Color(0, 0, 0));
+        dob_date_field.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dob_date_fieldPropertyChange(evt);
+            }
+        });
+
+        genderComboBox.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        genderComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel14.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel14.setText("Gender");
+
+        jLabel15.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel15.setText("Address");
+
+        addressTextArea.setColumns(20);
+        addressTextArea.setRows(5);
+        jScrollPane1.setViewportView(addressTextArea);
+
+        jButton1.setBackground(new java.awt.Color(255, 255, 255));
+        jButton1.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(0, 0, 0));
+        jButton1.setText("Save");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jButton2.setText("Clear");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jLabel16.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel16.setText("Id");
+
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField1KeyReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -93,27 +194,34 @@ public class Patient extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(firstNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
-                        .addComponent(lastNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
-                        .addComponent(mobileField, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
-                        .addComponent(statusCombo, 0, 278, Short.MAX_VALUE)
-                        .addComponent(jLabel8)
-                        .addComponent(jLabel9)
-                        .addComponent(jLabel11)
-                        .addComponent(jLabel12)
-                        .addComponent(jLabel10)
-                        .addComponent(to_date_field, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(emailField, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
-                        .addComponent(jLabel13)))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                    .addComponent(firstNameField)
+                    .addComponent(lastNameField)
+                    .addComponent(mobileField)
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel9)
+                    .addComponent(jLabel11)
+                    .addComponent(jLabel10)
+                    .addComponent(emailField)
+                    .addComponent(jLabel13)
+                    .addComponent(dob_date_field, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(genderComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel14)
+                    .addComponent(jLabel15)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel16)
+                    .addComponent(jTextField1))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addComponent(jLabel16)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel8)
                 .addGap(1, 1, 1)
                 .addComponent(firstNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -124,7 +232,7 @@ public class Patient extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel10)
                 .addGap(1, 1, 1)
-                .addComponent(to_date_field, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(dob_date_field, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel11)
                 .addGap(1, 1, 1)
@@ -133,11 +241,75 @@ public class Patient extends javax.swing.JPanel {
                 .addComponent(jLabel13)
                 .addGap(1, 1, 1)
                 .addComponent(emailField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(75, 75, 75)
-                .addComponent(jLabel12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel14)
                 .addGap(0, 0, 0)
-                .addComponent(statusCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(211, Short.MAX_VALUE))
+                .addComponent(genderComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel15)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 94, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2)
+                .addContainerGap())
+        );
+
+        patientTable.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        patientTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Id", "First Name", "Last Name", "DOB", "Gender", "Mobile", "Email", "Address"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        patientTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                patientTableMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(patientTable);
+
+        jLabel1.setFont(new java.awt.Font("Poppins", 1, 16)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Patient Registration");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -145,51 +317,356 @@ public class Patient extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(759, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 745, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void to_date_fieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_to_date_fieldPropertyChange
+    private void loadTable(String pid, String fname, String lname, String mobile, String email) {
+
+        try {
+
+            ResultSet resultSet = MySQL.execute("SELECT * FROM `patients` INNER JOIN `gender` ON `gender`.`gender_id`=`patients`.`gender_gender_id` WHERE `patient_id` LIKE '" + pid + "%' AND `first_name` LIKE '" + fname + "%' AND `last_name` LIKE '" + lname + "%' AND `contact_number` LIKE '" + mobile + "%' AND `email` LIKE '" + email + "%'");
+
+            DefaultTableModel model = (DefaultTableModel) patientTable.getModel();
+            model.setRowCount(0);
+
+            DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+            headerRenderer.setHorizontalAlignment(JLabel.CENTER);
+            patientTable.getTableHeader().setDefaultRenderer(headerRenderer);
+
+            DefaultTableCellRenderer dataRenderer = new DefaultTableCellRenderer();
+            dataRenderer.setHorizontalAlignment(JLabel.CENTER);
+            patientTable.setDefaultRenderer(Object.class, dataRenderer);
+            patientTable.setShowGrid(true);
+
+            while (resultSet != null && resultSet.next()) {
+                String t_id = resultSet.getString("patient_id");
+                String t_fname = resultSet.getString("first_name");
+                String t_lname = resultSet.getString("last_name");
+                String t_dob = resultSet.getString("dob");
+                String t_gender = resultSet.getString("gender.gender_name");
+                String t_mobile = resultSet.getString("contact_number");
+                String t_email = resultSet.getString("email");
+                String t_address = resultSet.getString("address");
+
+                Vector<String> v = new Vector<>();
+                v.add(t_id);
+                v.add(t_fname);
+                v.add(t_lname);
+                v.add(t_dob);
+                v.add(t_gender);
+                v.add(t_mobile);
+                v.add(t_email);
+                v.add(t_address);
+
+                model.addRow(v);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void clear() {
+        jTextField1.setText("");
+        firstNameField.setText("");
+        lastNameField.setText("");
+        mobileField.setText("");
+        emailField.setText("");
+        addressTextArea.setText("");
+        dob_date_field.setDate(null);
+        genderComboBox.setSelectedIndex(0);
+
+        patientTable.setEnabled(true);
+    }
+
+    private void loadGender() {
+        try {
+            ResultSet resultSet = MySQL.execute("SELECT * FROM `gender`");
+            Vector v = new Vector();
+            v.add("Select");
+
+            while (resultSet.next()) {
+                v.add(resultSet.getString("gender_name"));
+                genderMap.put(resultSet.getString("gender_name"), resultSet.getString("gender_id"));
+            }
+
+            DefaultComboBoxModel model = (DefaultComboBoxModel) genderComboBox.getModel();
+            model.removeAllElements();
+
+            model.addAll(v);
+            genderComboBox.setSelectedIndex(0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void dob_date_fieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dob_date_fieldPropertyChange
         // TODO add your handling code here:
-        String formatedExDate1 = "";
-        String formatedExDate2 = "";
 
-        if (from_date_field.getDate() != null) {
-            formatedExDate1 = new SimpleDateFormat("yyyy-MM-dd").format(from_date_field.getDate());
+    }//GEN-LAST:event_dob_date_fieldPropertyChange
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        loadTable("", "", "", "", "");
+        clear();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void patientTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_patientTableMouseClicked
+        // TODO add your handling code here:
+        if (evt.getClickCount() == 1) {
+            DefaultTableModel model = (DefaultTableModel) patientTable.getModel();
+            int selectedRow = patientTable.getSelectedRow();
+            if (selectedRow != -1) {
+                String id = String.valueOf(model.getValueAt(selectedRow, 0));
+                String fname = String.valueOf(model.getValueAt(selectedRow, 1));
+                String lname = String.valueOf(model.getValueAt(selectedRow, 2));
+                String dob = String.valueOf(model.getValueAt(selectedRow, 3));
+                String gender = String.valueOf(model.getValueAt(selectedRow, 4));
+                String mobile = String.valueOf(model.getValueAt(selectedRow, 5));
+                String email = String.valueOf(model.getValueAt(selectedRow, 6));
+                String address = String.valueOf(model.getValueAt(selectedRow, 7));
+
+                jTextField1.setText(id);
+                firstNameField.setText(fname);
+                lastNameField.setText(lname);
+                mobileField.setText(mobile);
+                emailField.setText(email);
+                addressTextArea.setText(address);
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    Date date = sdf.parse(dob);
+                    dob_date_field.setDate(date);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                genderComboBox.setSelectedItem(gender);
+            }
+            patientTable.setEnabled(false);
+        } else if (evt.getClickCount() == 2) {
+            PatientRecord patientRecord = new PatientRecord();
+            Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+            JDialog dialog = new JDialog(window, "PatientRecord", Dialog.ModalityType.APPLICATION_MODAL);
+            dialog.getContentPane().add(patientRecord);
+            dialog.pack();
+            dialog.setLocationRelativeTo(this);
+
+            // Set default close operation to DISPOSE (triggers windowClosed)
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+            // Reload table when dialog closes (works for both X and buttons)
+            dialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+
+                }
+            });
+
+            dialog.setVisible(true);
         }
-        if (to_date_field.getDate() != null) {
-            formatedExDate2 = new SimpleDateFormat("yyyy-MM-dd").format(to_date_field.getDate());
+
+    }//GEN-LAST:event_patientTableMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel model = (DefaultTableModel) patientTable.getModel();
+        int selectedRow = patientTable.getSelectedRow();
+        if (selectedRow != -1) {
+            String id = String.valueOf(model.getValueAt(selectedRow, 0));
+            String fname = firstNameField.getText();
+            String lname = lastNameField.getText();
+            String dob = new SimpleDateFormat("yyyy-MM-dd").format(dob_date_field.getDate());
+            String mobile = mobileField.getText();
+            String email = emailField.getText();
+            String address = addressTextArea.getText();
+            String selectedGender = (String) genderComboBox.getSelectedItem();
+            String genderId = genderMap.get(selectedGender);
+
+            if (fname.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Enter First Name", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (lname.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Enter Last Name", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (dob_date_field == null || dob_date_field.getDate() == null) {
+                JOptionPane.showMessageDialog(this, "Please Select Date of Birth", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (mobile.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Enter Mobile Number", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (email.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Enter Email", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (genderComboBox.getSelectedItem().equals("Select")) {
+                JOptionPane.showMessageDialog(this, "Please Select Gender", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (address.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Enter Address", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else {
+                MySQL.execute("UPDATE `patients` SET "
+                        + "`first_name` = '" + fname + "', "
+                        + "`last_name` = '" + lname + "', "
+                        + "`dob` = '" + dob + "', "
+                        + "`gender_gender_id` = '" + genderId + "', "
+                        + "`contact_number` = '" + mobile + "', "
+                        + "`email` = '" + email + "', "
+                        + "`address` = '" + address + "' "
+                        + "WHERE `patient_id` = " + id);
+                JOptionPane.showMessageDialog(this, "Update Success", "Info", JOptionPane.INFORMATION_MESSAGE);
+                clear();
+                loadTable("", "", "", "", "");
+
+            }
+        } else {
+            String fname = firstNameField.getText();
+            String lname = lastNameField.getText();
+            String dob = new SimpleDateFormat("yyyy-MM-dd").format(dob_date_field.getDate());
+            String mobile = mobileField.getText();
+            String email = emailField.getText();
+            String address = addressTextArea.getText();
+            String selectedGender = (String) genderComboBox.getSelectedItem();
+            String genderId = genderMap.get(selectedGender);
+
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = now.format(formatter);
+
+            if (fname.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Enter First Name", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (lname.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Enter Last Name", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (dob_date_field == null || dob_date_field.getDate() == null) {
+                JOptionPane.showMessageDialog(this, "Please Select Date of Birth", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (mobile.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Enter Mobile Number", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (email.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Enter Email", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (genderComboBox.getSelectedItem().equals("Select")) {
+                JOptionPane.showMessageDialog(this, "Please Select Gender", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else if (address.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Enter Address", "Warning", JOptionPane.WARNING_MESSAGE);
+
+            } else {
+
+                MySQL.execute("INSERT INTO `patients`(`first_name`, `last_name`, `dob`, `gender_gender_id`, `contact_number`, `email`, `address`, `created_at`) "
+                        + "VALUES ('" + fname + "', '" + lname + "', '" + dob + "', '" + genderId + "', '" + mobile + "', '" + email + "', '" + address + "', '" + formattedDateTime + "')");
+                JOptionPane.showMessageDialog(this, "Success", "Info", JOptionPane.INFORMATION_MESSAGE);
+                clear();
+                loadTable("", "", "", "", "");
+            }
         }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
-        Object metjodobj = paymentMethodComboBox.getSelectedItem();
-        String method = (metjodobj != null && "Select".equals(metjodobj.toString())) ? "" : (metjodobj != null ? metjodobj.toString() : "");
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+        // TODO add your handling code here:
+        String id = jTextField1.getText();
+        String fname = firstNameField.getText();
+        String lname = lastNameField.getText();
+        String mobile = mobileField.getText();
+        String email = emailField.getText();
+        loadTable(id, fname, lname, mobile, email);
+    }//GEN-LAST:event_jTextField1KeyReleased
 
-        loadTable(formatedExDate1, formatedExDate2, method);
-    }//GEN-LAST:event_to_date_fieldPropertyChange
+    private void firstNameFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_firstNameFieldKeyReleased
+        // TODO add your handling code here:
+        String id = jTextField1.getText();
+        String fname = firstNameField.getText();
+        String lname = lastNameField.getText();
+        String mobile = mobileField.getText();
+        String email = emailField.getText();
+        loadTable(id, fname, lname, mobile, email);
+    }//GEN-LAST:event_firstNameFieldKeyReleased
+
+    private void lastNameFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lastNameFieldKeyReleased
+        // TODO add your handling code here:
+        String id = jTextField1.getText();
+        String fname = firstNameField.getText();
+        String lname = lastNameField.getText();
+        String mobile = mobileField.getText();
+        String email = emailField.getText();
+        loadTable(id, fname, lname, mobile, email);
+    }//GEN-LAST:event_lastNameFieldKeyReleased
+
+    private void mobileFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_mobileFieldKeyReleased
+        // TODO add your handling code here:
+        String id = jTextField1.getText();
+        String fname = firstNameField.getText();
+        String lname = lastNameField.getText();
+        String mobile = mobileField.getText();
+        String email = emailField.getText();
+        loadTable(id, fname, lname, mobile, email);
+    }//GEN-LAST:event_mobileFieldKeyReleased
+
+    private void emailFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_emailFieldKeyReleased
+        // TODO add your handling code here:
+        String id = jTextField1.getText();
+        String fname = firstNameField.getText();
+        String lname = lastNameField.getText();
+        String mobile = mobileField.getText();
+        String email = emailField.getText();
+        loadTable(id, fname, lname, mobile, email);
+    }//GEN-LAST:event_emailFieldKeyReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea addressTextArea;
+    private com.toedter.calendar.JDateChooser dob_date_field;
     private javax.swing.JTextField emailField;
     private javax.swing.JTextField firstNameField;
+    private javax.swing.JComboBox<String> genderComboBox;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField lastNameField;
     private javax.swing.JTextField mobileField;
-    private javax.swing.JComboBox<String> statusCombo;
-    private com.toedter.calendar.JDateChooser to_date_field;
+    private javax.swing.JTable patientTable;
     // End of variables declaration//GEN-END:variables
 }
