@@ -11,6 +11,7 @@ import controller.patient_records.LoggingDecorator;
 import controller.patient_records.PatientRecordAccess;
 import java.awt.Window;
 import java.time.LocalDateTime;
+import java.util.Date;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -39,12 +40,16 @@ public class PatientRecord extends javax.swing.JPanel {
         this.userBean = userBean;
         loadData();
     }
-
+    
     private void loadData() {
+        loadData(null, null);
+    }
+
+    private void loadData(Date fromDate, Date toDate) {
         try {
             int patientId = Integer.parseInt(pid);
 
-            PatientRecordAccess basicRecord = new DatabasePatientRecord(patientId);
+            PatientRecordAccess basicRecord = new DatabasePatientRecord(patientId, fromDate, toDate);
             PatientRecordAccess loggedRecord = new LoggingDecorator(basicRecord);
             PatientRecordAccess encryptedRecord = new EncryptionDecorator(loggedRecord);
             PatientRecordAccess securedRecord = new AccessControlDecorator(encryptedRecord);
@@ -74,7 +79,6 @@ public class PatientRecord extends javax.swing.JPanel {
             ex.printStackTrace();
             hasData = false;
         }
-
     }
 
     public boolean hasData() {
@@ -259,10 +263,34 @@ public class PatientRecord extends javax.swing.JPanel {
 
     private void from_date_fieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_from_date_fieldPropertyChange
         // TODO add your handling code here:
+        Date fromDate = from_date_field.getDate();
+        Date toDate = to_date_field1.getDate();
+        
+        // Validate dates
+        if (fromDate != null && toDate != null && fromDate.after(toDate)) {
+            JOptionPane.showMessageDialog(this, 
+                "From date cannot be after To date", 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        loadData(fromDate, toDate);
     }//GEN-LAST:event_from_date_fieldPropertyChange
 
     private void to_date_field1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_to_date_field1PropertyChange
         // TODO add your handling code here:
+         Date fromDate = from_date_field.getDate();
+        Date toDate = to_date_field1.getDate();
+        
+        // Validate dates
+        if (fromDate != null && toDate != null && fromDate.after(toDate)) {
+            JOptionPane.showMessageDialog(this, 
+                "From date cannot be after To date", 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        loadData(fromDate, toDate);
     }//GEN-LAST:event_to_date_field1PropertyChange
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -282,7 +310,8 @@ public class PatientRecord extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(this, "Please input Treatment.", "Warning", JOptionPane.WARNING_MESSAGE);
         } else {
             try {
-                MySQL.execute("UPDATE `patient_records` SET `medical_history` = '" + medical_history + "', `treatment` = '" + treatment + "', `record_datetime`='" + now + "' WHERE `record_id` = '" + recordId + "'");
+                MySQL.execute("UPDATE `patient_records` SET `medical_history` = '" + medical_history + "', `treatment` = '" + treatment + "', `record_datetime`='" + now + "' "
+                        + "WHERE `record_id` = '" + recordId + "'");
                 JOptionPane.showMessageDialog(this, "Update Success.", "Info", JOptionPane.INFORMATION_MESSAGE);
                   clear();
             } catch (Exception e) {
@@ -295,6 +324,8 @@ public class PatientRecord extends javax.swing.JPanel {
 
     private void clear_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_btnActionPerformed
         // TODO add your handling code here:
+         from_date_field.setDate(null);
+        to_date_field1.setDate(new Date());
         clear();
     }//GEN-LAST:event_clear_btnActionPerformed
 
