@@ -4,6 +4,21 @@
  */
 package view;
 
+import controller.patient_records.AccessControlDecorator;
+import controller.patient_records.DatabasePatientRecord;
+import controller.patient_records.EncryptionDecorator;
+import controller.patient_records.LoggingDecorator;
+import controller.patient_records.PatientRecordAccess;
+import java.awt.Window;
+import java.time.LocalDateTime;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+import model.LogedUserBean;
+import model.MySQL;
+import view.Patient.PatientData;
+
 /**
  *
  * @author mohan
@@ -13,8 +28,57 @@ public class PatientRecord extends javax.swing.JPanel {
     /**
      * Creates new form PatientRecord
      */
-    public PatientRecord() {
+    private String pid;
+    private LogedUserBean userBean;
+    private boolean hasData = false;
+    private int recordId = 0;
+
+    public PatientRecord(LogedUserBean userBean, String id) {
         initComponents();
+        this.pid = id;
+        this.userBean = userBean;
+        loadData();
+    }
+
+    private void loadData() {
+        try {
+            int patientId = Integer.parseInt(pid);
+
+            PatientRecordAccess basicRecord = new DatabasePatientRecord(patientId);
+            PatientRecordAccess loggedRecord = new LoggingDecorator(basicRecord);
+            PatientRecordAccess encryptedRecord = new EncryptionDecorator(loggedRecord);
+            PatientRecordAccess securedRecord = new AccessControlDecorator(encryptedRecord);
+
+            DefaultTableModel patientRecords = securedRecord.getRecord(userBean.getStaffRole());
+
+            record_table.setModel(patientRecords);
+
+            if (patientRecords.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this,
+                        "No records found or access denied for role: " + userBean.getStaffRole(),
+                        "Information", JOptionPane.INFORMATION_MESSAGE);
+                hasData = false;
+            } else {
+                hasData = true;
+            }
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Invalid patient ID: " + pid,
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            hasData = false;
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error loading records: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+            hasData = false;
+        }
+
+    }
+
+    public boolean hasData() {
+        return hasData;
     }
 
     /**
@@ -33,14 +97,14 @@ public class PatientRecord extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         clear_btn = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        record_table = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTextArea3 = new javax.swing.JTextArea();
 
         jPanel1.setBackground(new java.awt.Color(0, 150, 136));
 
@@ -93,7 +157,7 @@ public class PatientRecord extends javax.swing.JPanel {
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
                 .addComponent(to_date_field1, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
                 .addComponent(clear_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -110,34 +174,26 @@ public class PatientRecord extends javax.swing.JPanel {
                 .addContainerGap(17, Short.MAX_VALUE))
         );
 
-        jTable1.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        record_table.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        record_table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
                 "id", "Medical History", "Treatment", "Record DateTime"
             }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+        ));
+        record_table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                record_tableMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(record_table);
 
         jTextArea1.setColumns(20);
         jTextArea1.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
         jTextArea1.setRows(5);
         jScrollPane2.setViewportView(jTextArea1);
-
-        jTextArea2.setColumns(20);
-        jTextArea2.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        jTextArea2.setRows(5);
-        jScrollPane3.setViewportView(jTextArea2);
 
         jLabel3.setFont(new java.awt.Font("Poppins", 0, 16)); // NOI18N
         jLabel3.setText("Medical History ");
@@ -153,6 +209,11 @@ public class PatientRecord extends javax.swing.JPanel {
             }
         });
 
+        jTextArea3.setColumns(20);
+        jTextArea3.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        jTextArea3.setRows(5);
+        jScrollPane4.setViewportView(jTextArea3);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -163,17 +224,16 @@ public class PatientRecord extends javax.swing.JPanel {
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 432, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 439, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(288, 288, 288)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 439, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -188,12 +248,12 @@ public class PatientRecord extends javax.swing.JPanel {
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -207,11 +267,66 @@ public class PatientRecord extends javax.swing.JPanel {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        String medical_history = jTextArea1.getText();
+        String treatment = jTextArea3.getText();
+
+        System.out.println("medical_history: " + medical_history);
+        System.out.println("treatment: " + treatment);
+        System.out.println(recordId);
+        LocalDateTime now = LocalDateTime.now();
+        if (recordId == 0) {
+            JOptionPane.showMessageDialog(this, "Please Select Report From Table.", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else if (medical_history.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please input Medical History.", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else if (treatment.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please input Treatment.", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else {
+            try {
+                MySQL.execute("UPDATE `patient_records` SET `medical_history` = '" + medical_history + "', `treatment` = '" + treatment + "', `record_datetime`='" + now + "' WHERE `record_id` = '" + recordId + "'");
+                JOptionPane.showMessageDialog(this, "Update Success.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                  clear();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void clear_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_btnActionPerformed
         // TODO add your handling code here:
+        clear();
     }//GEN-LAST:event_clear_btnActionPerformed
+
+    private void clear(){
+        jTextArea1.setText("");
+        jTextArea3.setText("");
+        recordId = 0;
+        loadData();
+        record_table.setEnabled(true);
+    }
+    
+    private void record_tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_record_tableMouseClicked
+        // TODO add your handling code here:
+        if (evt.getClickCount() == 1) {
+            DefaultTableModel model = (DefaultTableModel) record_table.getModel();
+            int selectedRow = record_table.getSelectedRow();
+            if (selectedRow != -1) {
+                String record_id = String.valueOf(model.getValueAt(selectedRow, 0));
+                String medical_history = String.valueOf(model.getValueAt(selectedRow, 1));
+                String treatment = String.valueOf(model.getValueAt(selectedRow, 2));
+
+                int id = Integer.parseInt(record_id);
+                recordId = id;
+                System.out.println(record_id + "_" + medical_history + "_" + treatment);
+
+                jTextArea1.setText(medical_history);
+                jTextArea3.setText(treatment);
+
+                record_table.setEnabled(false);
+            }
+        }
+    }//GEN-LAST:event_record_tableMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -225,10 +340,10 @@ public class PatientRecord extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextArea jTextArea2;
+    private javax.swing.JTextArea jTextArea3;
+    private javax.swing.JTable record_table;
     private com.toedter.calendar.JDateChooser to_date_field1;
     // End of variables declaration//GEN-END:variables
 }

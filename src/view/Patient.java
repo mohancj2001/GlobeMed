@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
@@ -23,6 +24,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import controller.patient_records.*;
+import model.LogedUserBean;
 import model.MySQL;
 
 /**
@@ -35,9 +39,11 @@ public class Patient extends javax.swing.JPanel {
      * Creates new form Patient
      */
     private HashMap<String, String> genderMap = new HashMap<>();
+    LogedUserBean userBean;
 
-    public Patient() {
+    public Patient(LogedUserBean userBean) {
         initComponents();
+        this.userBean = userBean;
         applyTheme();
         loadGender();
         loadTable("", "", "", "", "");
@@ -248,8 +254,8 @@ public class Patient extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel15)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 94, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
@@ -439,6 +445,11 @@ public class Patient extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
 
+    public class PatientData {
+
+        public static String patientTable_patient_id;
+    }
+
     private void patientTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_patientTableMouseClicked
         // TODO add your handling code here:
         if (evt.getClickCount() == 1) {
@@ -472,25 +483,67 @@ public class Patient extends javax.swing.JPanel {
             }
             patientTable.setEnabled(false);
         } else if (evt.getClickCount() == 2) {
-            PatientRecord patientRecord = new PatientRecord();
-            Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
-            JDialog dialog = new JDialog(window, "PatientRecord", Dialog.ModalityType.APPLICATION_MODAL);
-            dialog.getContentPane().add(patientRecord);
-            dialog.pack();
-            dialog.setLocationRelativeTo(this);
+            DefaultTableModel model = (DefaultTableModel) patientTable.getModel();
+            int selectedRow = patientTable.getSelectedRow();
+            if (selectedRow != -1) {
+                String id = String.valueOf(model.getValueAt(selectedRow, 0));
+                PatientData.patientTable_patient_id = id;
 
-            // Set default close operation to DISPOSE (triggers windowClosed)
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                PatientRecord patientRecord = new PatientRecord(userBean, id);
+                
+//                dialog.getContentPane().add(patientRecord);
+//                dialog.pack();
+//                dialog.setLocationRelativeTo(this);
 
-            // Reload table when dialog closes (works for both X and buttons)
-            dialog.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosed(WindowEvent e) {
+                // Set default close operation to DISPOSE (triggers windowClosed)
+//                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//
+//                // Reload table when dialog closes (works for both X and buttons)
+//                dialog.addWindowListener(new WindowAdapter() {
+//                    @Override
+//                    public void windowClosed(WindowEvent e) {
+//
+//                    }
+//                });
 
+                if (patientRecord.hasData()) {
+                    Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+                    JDialog dialog = new JDialog(window, "PatientRecord", Dialog.ModalityType.APPLICATION_MODAL);
+                    dialog.getContentPane().add(patientRecord);
+                    dialog.pack();
+                    dialog.setLocationRelativeTo(this);
+                    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                    dialog.setVisible(true);
                 }
-            });
 
-            dialog.setVisible(true);
+            }
+
+            /// ////////////////////////////
+//            DefaultTableModel model = (DefaultTableModel) patientTable.getModel();
+//            int selectedRow = patientTable.getSelectedRow();
+//            if (selectedRow != -1) {
+//                int patientId = Integer.parseInt(String.valueOf(model.getValueAt(selectedRow, 0)));
+//                PatientRecordAccess recordAccess = new LoggingDecorator(
+//                        new AccessControlDecorator(
+//                                new EncryptionDecorator(
+//                                        new DatabasePatientRecord(patientId))));
+//
+//                List<String> records = recordAccess.getRecord(userBean.getStaffRole());
+//                records.forEach(System.out::println);
+//                EncryptionDecorator encryptionDecorator = new EncryptionDecorator(
+//                        new DatabasePatientRecord(patientId));
+//                PatientRecordAccess recordAccess = new LoggingDecorator(
+//                        new AccessControlDecorator(
+//                                encryptionDecorator));
+//                // Get encrypted records
+//                var encryptedRecords = recordAccess.getRecord(userBean.getStaffRole());
+//                System.out.println("Encrypted:");
+//                encryptedRecords.forEach(System.out::println);
+//
+//                // Decrypt them (on demand)
+//                System.out.println("\nDecrypted:");
+//                encryptedRecords.forEach(r -> System.out.println(encryptionDecorator.decrypt(r)));
+//            }
         }
 
     }//GEN-LAST:event_patientTableMouseClicked

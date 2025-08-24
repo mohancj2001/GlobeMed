@@ -481,7 +481,7 @@ public class Home extends javax.swing.JFrame {
     private void p_records_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_p_records_btnActionPerformed
         //Patient
         main_panel.removeAll();
-        patient = new Patient();
+        patient = new Patient(userBean);
         main_panel.add(patient, BorderLayout.CENTER);
         SwingUtilities.updateComponentTreeUI(main_panel);
         HomeMenu = 2;
