@@ -12,18 +12,17 @@ public class EncryptionDecorator extends RecordDecorator {
     public DefaultTableModel getRecord(String role) {
         DefaultTableModel model = super.getRecord(role);
         
-        // For authorized roles, return decrypted data. For others, return encrypted.
         if ("Doctor".equalsIgnoreCase(role) ||
             "Nurse".equalsIgnoreCase(role) ||
             "Admin".equalsIgnoreCase(role)) {
-            return model; // Return as-is (decrypted) for authorized roles
+            return model; 
         } else {
-            return encryptTableModel(model); // Encrypt for unauthorized roles
+            return encryptTableModel(model);
         }
     }
 
     private DefaultTableModel encryptTableModel(DefaultTableModel model) {
-        // Get column names by iterating through columns
+       
         Vector<String> columnNames = new Vector<>();
         for (int i = 0; i < model.getColumnCount(); i++) {
             columnNames.add(model.getColumnName(i));
@@ -38,7 +37,7 @@ public class EncryptionDecorator extends RecordDecorator {
                 if (value instanceof String) {
                     row.add(encrypt((String) value));
                 } else {
-                    row.add(value); // Keep non-string values as is
+                    row.add(value);
                 }
             }
             encryptedModel.addRow(row);

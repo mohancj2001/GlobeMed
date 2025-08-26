@@ -1,6 +1,7 @@
 package view;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import controller.role_based_access_control.MedicalStaff;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.SwingUtilities;
@@ -12,6 +13,7 @@ public class Home extends javax.swing.JFrame {
 
     Dashboard dashboard;
     Patient patient;
+    Staff staff;
     private int HomeMenu = 0;
 
     private static boolean menu_status = true;
@@ -25,8 +27,36 @@ public class Home extends javax.swing.JFrame {
         main_panel.add(dashboard, BorderLayout.CENTER);
         SwingUtilities.updateComponentTreeUI(main_panel);
         HomeMenu = 1;
+        applyPermissions();
         applyTheme();
         this.setTitle("GlobeMed Health Care");
+    }
+
+    private void applyPermissions() {
+        MedicalStaff medicalStaff = userBean.getMedicalStaff();
+
+        // Debug output
+//        System.out.println("=== Permission Check Debug ===");
+//        System.out.println("Staff: " + medicalStaff.getFirstName() + " " + medicalStaff.getLastName());
+//        System.out.println("Roles: " + medicalStaff.getRoles().size());
+
+        String[] permissionsToCheck = {
+            "Patient", "Appointments", "Billing & Invoicing",
+            "Pharmacy", "Medical Reports", "Staff Management"
+        };
+
+        for (String permission : permissionsToCheck) {
+            boolean hasPerm = medicalStaff.hasPermission(permission);
+            System.out.println("Has '" + permission + "': " + hasPerm);
+        }
+
+        // Apply permissions to buttons
+        p_records_btn.setEnabled(medicalStaff.hasPermission("Patient"));
+        appointments_btn.setEnabled(medicalStaff.hasPermission("Appointments"));
+        billing_btn.setEnabled(medicalStaff.hasPermission("Billing & Invoicing"));
+        pharmacy_btn.setEnabled(medicalStaff.hasPermission("Pharmacy"));
+        medical_reports_btn.setEnabled(medicalStaff.hasPermission("Medical Reports"));
+        staff_btn.setEnabled(medicalStaff.hasPermission("Staff Management"));
     }
 
     private void applyTheme() {
@@ -507,6 +537,10 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_medical_reports_btnActionPerformed
 
     private void staff_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_staff_btnActionPerformed
+        main_panel.removeAll();
+        staff = new Staff();
+        main_panel.add(staff, BorderLayout.CENTER);
+        SwingUtilities.updateComponentTreeUI(main_panel);
         HomeMenu = 7;
         applyTheme();
     }//GEN-LAST:event_staff_btnActionPerformed

@@ -1,5 +1,7 @@
 package model;
 
+import controller.role_based_access_control.MedicalStaff;
+
 public class LogedUserBean {
 
     private int staffId;
@@ -8,6 +10,8 @@ public class LogedUserBean {
     private String staffRole;
     private String fname;
     private String lname;
+
+    private MedicalStaff medicalStaff;
 
     public int getStaffId() {
         return staffId;
@@ -57,6 +61,12 @@ public class LogedUserBean {
         this.lname = lname;
     }
 
-   
+    public MedicalStaff getMedicalStaff() {
+        return medicalStaff;
+    }
+
+    public void setMedicalStaff(MedicalStaff medicalStaff) {
+        this.medicalStaff = medicalStaff;
+    }
 
 }

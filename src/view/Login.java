@@ -7,6 +7,9 @@ package view;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import com.mysql.cj.Session;
+import controller.role_based_access_control.MedicalStaff;
+import controller.role_based_access_control.RBACSystem;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import java.sql.ResultSet;
@@ -239,7 +242,18 @@ public class Login extends javax.swing.JFrame {
                     userBean.setStaffRole(resultSet.getString("roles_role_id"));
                     userBean.setStaffRole(resultSet.getString("role_name"));
                     JOptionPane.showMessageDialog(this, "Login Success", "Info", JOptionPane.INFORMATION_MESSAGE);
-                    
+
+                    RBACSystem rbacSystem = new RBACSystem();
+                    rbacSystem.loadFromDatabase();
+                    MedicalStaff staff = rbacSystem.loadStaffMember(resultSet.getInt("staff_id"));
+                    userBean.setMedicalStaff(staff);
+                    rbacSystem.debugSystem();
+
+
+                    if (staff != null) {
+                        staff.displayPermissions();
+                    }
+
                     Home home = new Home(userBean);
                     home.setVisible(true);
                     this.dispose();
