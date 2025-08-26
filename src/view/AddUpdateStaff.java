@@ -352,7 +352,7 @@ public class AddUpdateStaff extends javax.swing.JPanel {
                 String selectedStatus = (String) jComboBox2.getSelectedItem();
 
                 if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty()
-                        || mobile.isEmpty() || license.isEmpty() || branch.isEmpty()
+                        || mobile.isEmpty() || branch.isEmpty()
                         || "Select".equals(selectedRole) || "Select".equals(selectedStatus)) {
 
                     JOptionPane.showMessageDialog(this, "Please fill all required fields", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -368,7 +368,7 @@ public class AddUpdateStaff extends javax.swing.JPanel {
                         + "username = '" + username + "', "
                         + "speciality = '" + (speciality.isEmpty() ? "" : speciality) + "', "
                         + "mobile = '" + mobile + "', "
-                        + "license = '" + license + "', "
+                        + "license = '" + (license.isEmpty() ? "" : license )+ "', "
                         + "roles_role_id = '" + roleId + "', "
                         + "status_id = '" + statusId + "', "
                         + "branch = '" + branch + "' "
@@ -422,7 +422,7 @@ public class AddUpdateStaff extends javax.swing.JPanel {
                 try {
                     String query = "INSERT INTO staff (first_name, last_name, username, password, speciality, mobile, license, roles_role_id, status_id, branch) "
                             + "VALUES ('" + firstName + "', '" + lastName + "', '" + username + "', '" + password + "', "
-                            + "'" + (speciality.isEmpty() ? null : speciality) + "', '" + mobile + "', '" + (license.isEmpty() ? null : license) + "', "
+                            + "'" + (speciality.isEmpty() ? "" : speciality) + "', '" + mobile + "', '" + (license.isEmpty() ? "" : license) + "', "
                             + "'" + roleId + "', '" + statusId + "', '" + branch + "')";
 
                     MySQL.execute(query);

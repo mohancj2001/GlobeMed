@@ -488,6 +488,12 @@ public class Staff extends javax.swing.JPanel {
         dialog.setLocationRelativeTo(this);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
+        dialog.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        loadtable("", "", "", "", "");
+                    }
+                });
     }//GEN-LAST:event_jButton3ActionPerformed
 
 
