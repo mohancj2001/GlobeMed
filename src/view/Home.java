@@ -14,6 +14,7 @@ public class Home extends javax.swing.JFrame {
     Dashboard dashboard;
     Patient patient;
     Staff staff;
+    Appointments appointments;
     private int HomeMenu = 0;
 
     private static boolean menu_status = true;
@@ -496,6 +497,10 @@ public class Home extends javax.swing.JFrame {
     private void appointments_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_appointments_btnActionPerformed
         HomeMenu = 3;
         applyTheme();
+        main_panel.removeAll();
+        appointments = new Appointments();
+        main_panel.add(appointments, BorderLayout.CENTER);
+        SwingUtilities.updateComponentTreeUI(main_panel);
     }//GEN-LAST:event_appointments_btnActionPerformed
 
     private void dashboard_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashboard_btnActionPerformed

@@ -15,7 +15,7 @@ public class AccessControlDecorator extends RecordDecorator {
                 "Admin".equalsIgnoreCase(role)) {
             return super.getRecord(role);
         } else {
-            // Return empty table model for unauthorized access
+           
             String[] columnNames = {"Record ID", "Medical History", "Treatment", "Date"};
             return new DefaultTableModel(columnNames, 0);
         }

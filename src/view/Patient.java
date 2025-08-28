@@ -32,7 +32,7 @@ import model.MySQL;
 /**
  *
  * @author mohan
- */
+ */ 
 public class Patient extends javax.swing.JPanel {
 
     /**

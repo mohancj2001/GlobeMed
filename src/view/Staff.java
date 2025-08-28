@@ -471,7 +471,6 @@ public class Staff extends javax.swing.JPanel {
                     }
                 });
             }
-            
 
         }
         loadtable("", "", "", "", "");
@@ -489,11 +488,11 @@ public class Staff extends javax.swing.JPanel {
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
         dialog.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                        loadtable("", "", "", "", "");
-                    }
-                });
+            @Override
+            public void windowClosing(WindowEvent e) {
+                loadtable("", "", "", "", "");
+            }
+        });
     }//GEN-LAST:event_jButton3ActionPerformed
 
 
