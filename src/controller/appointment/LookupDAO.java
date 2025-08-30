@@ -106,4 +106,37 @@ public class LookupDAO {
         
         return "Unknown Branch (" + branchId + ")";
     }
+    
+    public Map<Integer, String> getAppointmentStatuses() {
+        Map<Integer, String> statuses = new HashMap<>();
+        String sql = "SELECT appointment_status_id, appointment_status_name FROM appointment_status";
+        
+        try {
+            ResultSet rs = MySQL.execute(sql);
+            if (rs != null) {
+                while (rs.next()) {
+                    statuses.put(rs.getInt("appointment_status_id"), rs.getString("appointment_status_name"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return statuses;
+    }
+    
+    public String getAppointmentStatusName(int statusId) {
+        String sql = "SELECT appointment_status_name FROM appointment_status WHERE appointment_status_id = " + statusId;
+        
+        try {
+            ResultSet rs = MySQL.execute(sql);
+            if (rs != null && rs.next()) {
+                return rs.getString("appointment_status_name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return "Unknown Status (" + statusId + ")";
+    }
 }

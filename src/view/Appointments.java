@@ -12,6 +12,10 @@ import controller.appointment.HealthcareProfessionalDAO;
 import controller.appointment.LookupDAO;
 import controller.appointment.PatientDAO;
 import controller.appointment.SchedulerMediator;
+import java.awt.Dialog;
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
@@ -20,10 +24,12 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JDialog;
 import model.MySQL;
 
 /**
@@ -40,13 +46,14 @@ public class Appointments extends javax.swing.JPanel {
     private PatientDAO patientDAO;
     private HealthcareProfessionalDAO doctorDAO;
     private LookupDAO lookupDAO;
+    private AppointmentDAO appointmentDAO;
 
     private HashMap<String, String> apStatusMap = new HashMap<>();
 
     public Appointments() {
 
         initComponents();
-//       initializeServices();
+        initializeServices();
         patientDAO = new PatientDAO();
         loadPatientsToTable();
         doctorDAO = new HealthcareProfessionalDAO();
@@ -54,6 +61,23 @@ public class Appointments extends javax.swing.JPanel {
         loadDoctorsToTable();
         loadApStatus();
         loadAppointments("", "", "", "", "");
+    }
+
+    private void initializeServices() {
+        try {
+            // Initialize DAOs once
+            patientDAO = new PatientDAO();
+            professionalDAO = new HealthcareProfessionalDAO();
+            appointmentDAO = new AppointmentDAO();
+
+            // Initialize mediator and service
+            SchedulerMediator mediator = new SchedulerMediator(appointmentDAO, professionalDAO);
+            appointmentService = new AppointmentService(mediator, patientDAO, appointmentDAO);
+
+        } catch (Exception e) {
+            System.out.println("Error initializing services: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void filterAppointments() {
@@ -412,87 +436,147 @@ public class Appointments extends javax.swing.JPanel {
         loadPatientsToTable();
     }
 
-    private void initializeServices() {
-        DefaultTableModel model1 = (DefaultTableModel) dashboard_table.getModel();
-        int selectedRow2 = dashboard_table.getSelectedRow();
-        if (selectedRow2 != -1) {
-            //update part here
-        } else {
-            PatientDAO patientDAO = new PatientDAO();
-            HealthcareProfessionalDAO professionalDAO = new HealthcareProfessionalDAO();
-            AppointmentDAO appointmentDAO = new AppointmentDAO();
-
-            SchedulerMediator mediator = new SchedulerMediator(appointmentDAO, professionalDAO);
-            AppointmentService service = new AppointmentService(mediator, patientDAO, appointmentDAO);
-
-            // Check available doctors
-            List<HealthcareProfessional> doctors = professionalDAO.getAllDoctors();
-            System.out.println("Available Doctors:");
-            for (HealthcareProfessional doctor : doctors) {
-                System.out.println("- " + doctor.toString());
-            }
-
-            int selectedRow = staff_table.getSelectedRow();
-
-            if (selectedRow != -1) {
-                String id = String.valueOf(staff_table.getValueAt(selectedRow, 0));
-                int doctorId = Integer.parseInt(id);
-                java.util.Date utilDate = appointment_date_field.getDate();
-                java.sql.Date appointmentDate = new java.sql.Date(utilDate.getTime());
-
-                List<Time> availableSlots = service.checkAvailability(doctorId, appointmentDate);
-
-                // Check availability for a specific doctor
-                System.out.println("\nAvailable slots for Dr. on " + appointmentDate + ":");
-                for (Time slot : availableSlots) {
-                    System.out.println("- " + slot);
-                }
-
-                // Book appointment
-                if (!availableSlots.isEmpty()) {
-                    int selectedRow1 = patientTable.getSelectedRow();
-
-                    if (selectedRow != -1) {
-                        String pid = String.valueOf(patientTable.getValueAt(selectedRow1, 0));
-                        int patientId = Integer.parseInt(pid);
-                        //i want to set time by time picker here
-                        String timeString = timePicker1.getTimeStringOrEmptyString();
-                        if (!timeString.isEmpty()) {
-                            try {
-                                // Parse the time string (assuming format like "14:30")
-                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                                java.util.Date utilTime = sdf.parse(timeString);
-                                Time selectedTime = new Time(utilTime.getTime());
-
-                                boolean booked = service.bookAppointment(patientId, doctorId, appointmentDate, selectedTime);
-                                if (booked) {
-                                    System.out.println("Appointment booked successfully!");
-                                } else {
-                                    System.out.println("Failed to book appointment.");
-                                }
-                            } catch (Exception e) {
-                                System.out.println("Invalid time format: " + timeString);
-                            }
-                        } else {
-                            System.out.println("Please select a time.");
-                        }
-                    }
-
-                }
-
-            }
-
-            // View all appointments
-            List<Appointment> appointments = service.getAllAppointments();
-            System.out.println("\nAll Appointments:");
-            for (Appointment appt : appointments) {
-                System.out.println("ID: " + appt.getAppointmentId()
-                        + " | Date: " + appt.getAppointmentDate()
-                        + " | Time: " + appt.getAppointmentTime());
-            }
-        }
-    }
-
+//    private void initializeServices() {
+//        DefaultTableModel model1 = (DefaultTableModel) dashboard_table.getModel();
+//        int selectedRow2 = dashboard_table.getSelectedRow();
+//        if (selectedRow2 != -1) {
+//            try {
+//                // Update part here
+//                // Full update of an appointment
+//                PatientDAO patientDAO = new PatientDAO();
+//                HealthcareProfessionalDAO professionalDAO = new HealthcareProfessionalDAO();
+//                AppointmentDAO appointmentDAO = new AppointmentDAO();
+//
+//                SchedulerMediator mediator = new SchedulerMediator(appointmentDAO, professionalDAO);
+//                AppointmentService service = new AppointmentService(mediator, patientDAO, appointmentDAO);
+//                int appointmentId = Integer.parseInt(String.valueOf(model1.getValueAt(selectedRow2, 0)));
+//
+//                java.util.Date utilDate = appointment_date_field.getDate();
+//                java.sql.Date appointmentDate = new java.sql.Date(utilDate.getTime());
+//
+//                String timeString = timePicker1.getTimeStringOrEmptyString();
+//                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+//                java.util.Date utilTime = sdf.parse(timeString);
+//                java.sql.Time selectedTime = new java.sql.Time(utilTime.getTime());
+//
+//                if (jComboBox1.getSelectedIndex() == 1) {
+//                    boolean updateSuccess = appointmentService.updateAppointment(
+//                            appointmentId, // appointmentId
+//                            appointmentDate, // new date - already java.sql.Date
+//                            selectedTime, // new time - already java.sql.Time
+//                            AppointmentDAO.STATUS_SCHEDULED // status
+//                    );
+//                    if (updateSuccess) {
+//                        System.out.println("Appointment booked successfully!");
+//                    } else {
+//                        System.out.println("Failed to book appointment.");
+//                    }
+//                } else if (jComboBox1.getSelectedIndex() == 2) {
+//                    boolean updateSuccess = appointmentService.updateAppointment(
+//                            appointmentId, // appointmentId
+//                            appointmentDate, // new date - already java.sql.Date
+//                            selectedTime, // new time - already java.sql.Time
+//                            AppointmentDAO.STATUS_COMPLETED // status
+//                    );
+//                    if (updateSuccess) {
+//                        System.out.println("Appointment booked successfully!");
+//                    } else {
+//                        System.out.println("Failed to book appointment.");
+//                    }
+//                } else {
+//                    boolean updateSuccess = appointmentService.updateAppointment(
+//                            appointmentId, // appointmentId
+//                            appointmentDate, // new date - already java.sql.Date
+//                            selectedTime, // new time - already java.sql.Time
+//                            AppointmentDAO.STATUS_CANCELLED // status
+//                    );
+//                    if (updateSuccess) {
+//                        System.out.println("Appointment booked successfully!");
+//                    } else {
+//                        System.out.println("Failed to book appointment.");
+//                    }
+//                }
+//                loadAppointments("", "", "", "", "");
+//                clearFilters1();
+//
+//            } catch (Exception e) {
+//                System.out.println("Error: " + e.getMessage());
+//            }
+//        } else {
+//            PatientDAO patientDAO = new PatientDAO();
+//            HealthcareProfessionalDAO professionalDAO = new HealthcareProfessionalDAO();
+//            AppointmentDAO appointmentDAO = new AppointmentDAO();
+//
+//            SchedulerMediator mediator = new SchedulerMediator(appointmentDAO, professionalDAO);
+//            AppointmentService service = new AppointmentService(mediator, patientDAO, appointmentDAO);
+//
+//            // Check available doctors
+//            List<HealthcareProfessional> doctors = professionalDAO.getAllDoctors();
+//            System.out.println("Available Doctors:");
+//            for (HealthcareProfessional doctor : doctors) {
+//                System.out.println("- " + doctor.toString());
+//            }
+//
+//            int selectedRow = staff_table.getSelectedRow();
+//
+//            if (selectedRow != -1) {
+//                String id = String.valueOf(staff_table.getValueAt(selectedRow, 0));
+//                int doctorId = Integer.parseInt(id);
+//                java.util.Date utilDate = appointment_date_field.getDate();
+//                java.sql.Date appointmentDate = new java.sql.Date(utilDate.getTime());
+//
+//                List<Time> availableSlots = service.checkAvailability(doctorId, appointmentDate);
+//
+//                // Check availability for a specific doctor
+//                System.out.println("\nAvailable slots for Dr. on " + appointmentDate + ":");
+//                for (Time slot : availableSlots) {
+//                    System.out.println("- " + slot);
+//                }
+//
+//                // Book appointment
+//                if (!availableSlots.isEmpty()) {
+//                    int selectedRow1 = patientTable.getSelectedRow();
+//
+//                    if (selectedRow != -1) {
+//                        String pid = String.valueOf(patientTable.getValueAt(selectedRow1, 0));
+//                        int patientId = Integer.parseInt(pid);
+//                        //i want to set time by time picker here
+//                        String timeString = timePicker1.getTimeStringOrEmptyString();
+//                        if (!timeString.isEmpty()) {
+//                            try {
+//                                // Parse the time string (assuming format like "14:30")
+//                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+//                                java.util.Date utilTime = sdf.parse(timeString);
+//                                Time selectedTime = new Time(utilTime.getTime());
+//
+//                                boolean booked = service.bookAppointment(patientId, doctorId, appointmentDate, selectedTime);
+//                                if (booked) {
+//                                    System.out.println("Appointment booked successfully!");
+//                                } else {
+//                                    System.out.println("Failed to book appointment.");
+//                                }
+//                            } catch (Exception e) {
+//                                System.out.println("Invalid time format: " + timeString);
+//                            }
+//                        } else {
+//                            System.out.println("Please select a time.");
+//                        }
+//                    }
+//
+//                }
+//
+//            }
+//
+//            // View all appointments
+//            List<Appointment> appointments = service.getAllAppointments();
+//            System.out.println("\nAll Appointments:");
+//            for (Appointment appt : appointments) {
+//                System.out.println("ID: " + appt.getAppointmentId()
+//                        + " | Date: " + appt.getAppointmentDate()
+//                        + " | Time: " + appt.getAppointmentTime());
+//            }
+//        }
+//    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -1011,7 +1095,7 @@ public class Appointments extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -1139,10 +1223,173 @@ public class Appointments extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        initializeServices();
+        int selectedRow2 = dashboard_table.getSelectedRow();
+        if (selectedRow2 != -1) {
+            updateAppointmentAction();
+        } else {
+            bookNewAppointmentAction();
+        }
         clearFilters1();
         loadAppointments("", "", "", "", "");
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void updateAppointmentAction() {
+        DefaultTableModel model1 = (DefaultTableModel) dashboard_table.getModel();
+        int selectedRow2 = dashboard_table.getSelectedRow();
+        if (selectedRow2 != -1) {
+            try {
+                int appointmentId = Integer.parseInt(String.valueOf(model1.getValueAt(selectedRow2, 0)));
+                java.util.Date utilDate = appointment_date_field.getDate();
+                java.sql.Date appointmentDate = new java.sql.Date(utilDate.getTime());
+
+                String timeString = timePicker1.getTimeStringOrEmptyString();
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                java.util.Date utilTime = sdf.parse(timeString);
+                java.sql.Time selectedTime = new java.sql.Time(utilTime.getTime());
+
+                int status;
+                if (jComboBox1.getSelectedIndex() == 1) {
+                    status = AppointmentDAO.STATUS_SCHEDULED;
+                    boolean updateSuccess = appointmentService.updateAppointment(
+                            appointmentId, appointmentDate, selectedTime, status
+                    );
+
+                    if (updateSuccess) {
+                        System.out.println("Appointment updated successfully!");
+                    } else {
+                        System.out.println("Failed to update appointment.");
+                    }
+                } else if (jComboBox1.getSelectedIndex() == 2) {
+                    status = AppointmentDAO.STATUS_COMPLETED;
+                    boolean updateSuccess = appointmentService.updateAppointment(
+                            appointmentId, appointmentDate, selectedTime, status
+                    );
+
+                    if (updateSuccess) {
+                        System.out.println("Appointment updated successfully!");
+                    } else {
+                        System.out.println("Failed to update appointment.");
+                    }
+
+                    LocalDateTime now = LocalDateTime.now();
+                    try {
+                        // ✅ Fix query quotes
+                        MySQL.execute("INSERT INTO `bills` (`created_datetime`, `bill_status_bill_status_id`, `bill_appointment_id`) "
+                                + "VALUES ('" + now + "', '" + 1 + "', '" + appointmentId + "')");
+
+                        // ✅ Fix alias for LAST_INSERT_ID
+                        ResultSet rs = MySQL.execute("SELECT LAST_INSERT_ID() AS bill_id");
+                        int billId = -1;
+                        if (rs.next()) {
+                            billId = rs.getInt("bill_id");
+                        }
+
+                        Add_Bill_Prices abp = new Add_Bill_Prices(billId);
+                        Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+                        JDialog dialog = new JDialog(window, "Add Bill Prices", Dialog.ModalityType.APPLICATION_MODAL);
+                        dialog.getContentPane().add(abp);
+                        dialog.pack();
+                        dialog.setLocationRelativeTo(this);
+                        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                        dialog.setVisible(true);
+
+                        dialog.addWindowListener(new WindowAdapter() {
+                            @Override
+                            public void windowClosing(WindowEvent e) {
+                                loadAppointments("", "", "", "", "");
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    status = AppointmentDAO.STATUS_CANCELLED;
+                    boolean updateSuccess = appointmentService.updateAppointment(
+                            appointmentId, appointmentDate, selectedTime, status
+                    );
+                    if (updateSuccess) {
+                        System.out.println("Appointment updated successfully!");
+                    } else {
+                        System.out.println("Failed to update appointment.");
+                    }
+
+                }
+
+                // Use the class-level appointmentService
+                loadAppointments("", "", "", "", "");
+                clearFilters1();
+
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void bookNewAppointmentAction() {
+        int selectedRow = staff_table.getSelectedRow();
+        if (selectedRow != -1) {
+            try {
+                String id = String.valueOf(staff_table.getValueAt(selectedRow, 0));
+                int doctorId = Integer.parseInt(id);
+                java.util.Date utilDate = appointment_date_field.getDate();
+                java.sql.Date appointmentDate = new java.sql.Date(utilDate.getTime());
+
+                // Check availability
+                List<Time> availableSlots = appointmentService.checkAvailability(doctorId, appointmentDate);
+
+                System.out.println("\nAvailable slots for Dr. on " + appointmentDate + ":");
+                for (Time slot : availableSlots) {
+                    System.out.println("- " + slot);
+                }
+
+                // Book appointment if slots available
+                if (!availableSlots.isEmpty()) {
+                    int selectedRow1 = patientTable.getSelectedRow();
+                    if (selectedRow1 != -1) {
+                        String pid = String.valueOf(patientTable.getValueAt(selectedRow1, 0));
+                        int patientId = Integer.parseInt(pid);
+
+                        String timeString = timePicker1.getTimeStringOrEmptyString();
+                        if (!timeString.isEmpty()) {
+                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                            java.util.Date utilTime = sdf.parse(timeString);
+                            Time selectedTime = new Time(utilTime.getTime());
+
+                            boolean booked = appointmentService.bookAppointment(patientId, doctorId, appointmentDate, selectedTime);
+                            if (booked) {
+                                System.out.println("Appointment booked successfully!");
+                            } else {
+                                System.out.println("Failed to book appointment.");
+                            }
+                        } else {
+                            System.out.println("Please select a time.");
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+                System.out.println("Error booking appointment: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+//    private void viewAllAppointments() {
+//        try {
+//            List<Appointment> appointments = appointmentService.getAllAppointments();
+//            System.out.println("\nAll Appointments:");
+//            for (Appointment appt : appointments) {
+//                System.out.println("ID: " + appt.getAppointmentId()
+//                        + " | Date: " + appt.getAppointmentDate()
+//                        + " | Time: " + appt.getAppointmentTime());
+//            }
+//        } catch (Exception e) {
+//            System.out.println("Error viewing appointments: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//    }
 
     private void dashboard_tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dashboard_tableMouseClicked
         // TODO add your handling code here:

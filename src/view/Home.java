@@ -15,6 +15,7 @@ public class Home extends javax.swing.JFrame {
     Patient patient;
     Staff staff;
     Appointments appointments;
+    Billing billing;
     private int HomeMenu = 0;
 
     private static boolean menu_status = true;
@@ -40,7 +41,6 @@ public class Home extends javax.swing.JFrame {
 //        System.out.println("=== Permission Check Debug ===");
 //        System.out.println("Staff: " + medicalStaff.getFirstName() + " " + medicalStaff.getLastName());
 //        System.out.println("Roles: " + medicalStaff.getRoles().size());
-
         String[] permissionsToCheck = {
             "Patient", "Appointments", "Billing & Invoicing",
             "Pharmacy", "Medical Reports", "Staff Management"
@@ -532,6 +532,11 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_pharmacy_btnActionPerformed
 
     private void billing_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_billing_btnActionPerformed
+
+        main_panel.removeAll();
+        billing = new Billing();
+        main_panel.add(billing, BorderLayout.CENTER);
+        SwingUtilities.updateComponentTreeUI(main_panel);
         HomeMenu = 4;
         applyTheme();
     }//GEN-LAST:event_billing_btnActionPerformed

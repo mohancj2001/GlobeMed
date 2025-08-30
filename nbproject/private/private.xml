@@ -3,18 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/controller/appointment/AppointmentDAO.java</file>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/controller/appointment/HealthcareProfessional.java</file>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/controller/appointment/Appointment.java</file>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/controller/appointment/Patient.java</file>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/controller/appointment/LookupDAO.java</file>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/controller/appointment/PatientTableLoader.java</file>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/controller/appointment/SchedulerMediator.java</file>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/view/Patient.java</file>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/controller/appointment/HealthcareProfessionalDAO.java</file>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/controller/appointment/AppointmentService.java</file>
+            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/view/Home.java</file>
+            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/view/Billing.java</file>
+            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/view/Add_Bill_Prices.java</file>
+            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/view/Dashboard.java</file>
+            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/view/Edit_Staff_Permissions.java</file>
             <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/view/Appointments.java</file>
-            <file>file:/C:/Users/mohan/OneDrive/Documents/NetBeansProjects/GlobeMed/src/controller/appointment/PatientDAO.java</file>
         </group>
     </open-files>
 </project-private>

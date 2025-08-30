@@ -27,21 +27,16 @@ public class SchedulerMediator {
     }
 
     public boolean cancelAppointment(int appointmentId) {
-        return appointmentDAO.updateAppointmentStatus(appointmentId, 3); // Assuming 3 is "Cancelled"
+        return appointmentDAO.updateAppointmentStatus(appointmentId, AppointmentDAO.STATUS_CANCELLED);
+    }
+
+    public boolean completeAppointment(int appointmentId) {
+        return appointmentDAO.updateAppointmentStatus(appointmentId, AppointmentDAO.STATUS_COMPLETED);
     }
 
     public boolean rescheduleAppointment(int appointmentId, Date newDate, Time newTime) {
-        // First get the existing appointment
-        List<Appointment> allAppointments = appointmentDAO.getAllAppointments();
-        Appointment existingAppointment = null;
-
-        for (Appointment app : allAppointments) {
-            if (app.getAppointmentId() == appointmentId) {
-                existingAppointment = app;
-                break;
-            }
-        }
-
+        // Get the existing appointment
+        Appointment existingAppointment = appointmentDAO.getAppointmentById(appointmentId);
         if (existingAppointment == null) {
             return false;
         }
@@ -52,26 +47,20 @@ public class SchedulerMediator {
             return false;
         }
 
-        // Create a new appointment with the updated time
-        Appointment updatedAppointment = new Appointment();
-        updatedAppointment.setAppointmentId(appointmentId);
-        updatedAppointment.setAppointmentDate(newDate);
-        updatedAppointment.setAppointmentTime(newTime);
-        updatedAppointment.setPatientId(existingAppointment.getPatientId());
-        updatedAppointment.setStaffId(existingAppointment.getStaffId());
-        updatedAppointment.setAppointmentStatusId(2); // Assuming 2 is "Rescheduled"
+        // Update the appointment with new date and time
+        existingAppointment.setAppointmentDate(newDate);
+        existingAppointment.setAppointmentTime(newTime);
+        existingAppointment.setAppointmentStatusId(AppointmentDAO.STATUS_SCHEDULED);
 
-        // For simplicity, we'll just update the status here
-        // In a real implementation, we would have an update method in the DAO
-        return appointmentDAO.updateAppointmentStatus(appointmentId, 2);
+        return appointmentDAO.updateAppointment(existingAppointment);
     }
 
-    private boolean isProfessionalAvailable(int professionalId, Date date, Time time) {
+    public boolean isProfessionalAvailable(int professionalId, Date date, Time time) {
         List<Appointment> existingAppointments = appointmentDAO.getAppointmentsByProfessional(professionalId, date);
 
         for (Appointment appointment : existingAppointments) {
             if (appointment.getAppointmentTime().equals(time) &&
-                    appointment.getAppointmentStatusId() != 3) { // Not cancelled
+                    appointment.getAppointmentStatusId() != AppointmentDAO.STATUS_CANCELLED) {
                 return false; // Professional already has an appointment at this time
             }
         }
@@ -87,7 +76,7 @@ public class SchedulerMediator {
 
         // Remove booked slots
         for (Appointment appointment : bookedAppointments) {
-            if (appointment.getAppointmentStatusId() != 3) { // Not cancelled
+            if (appointment.getAppointmentStatusId() != AppointmentDAO.STATUS_CANCELLED) {
                 allSlots.remove(appointment.getAppointmentTime());
             }
         }

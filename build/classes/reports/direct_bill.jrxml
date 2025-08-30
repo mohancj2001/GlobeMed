@@ -1,0 +1,109 @@
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="direct_bill" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6fe4191e-202d-4086-b60a-16c09f8ad92e">
+	<parameter name="invoice_num" class="java.lang.String"/>
+	<parameter name="date" class="java.lang.String"/>
+	<parameter name="total_amount" class="java.lang.String"/>
+	<parameter name="paid" class="java.lang.String"/>
+	<parameter name="balance" class="java.lang.String"/>
+	<query language="sql"><![CDATA[]]></query>
+	<field name="COLUMN_0" class="java.lang.String"/>
+	<field name="COLUMN_1" class="java.lang.String"/>
+	<field name="COLUMN_2" class="java.lang.String"/>
+	<field name="COLUMN_3" class="java.lang.String"/>
+	<field name="COLUMN_4" class="java.lang.String"/>
+	<field name="COLUMN_6" class="java.lang.String"/>
+	<background splitType="Stretch"/>
+	<title height="89" splitType="Stretch">
+		<element kind="staticText" uuid="b76e23c6-9a4d-4e0f-a456-493d76363dbf" mode="Opaque" x="5" y="0" width="544" height="30" forecolor="#FFFFFF" backcolor="#030303" fontSize="22.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[GLOBEMED]]></text>
+		</element>
+		<element kind="staticText" uuid="00eefa33-1229-4805-b3f7-cfe92c95061d" x="5" y="30" width="544" height="20" fontSize="13.0" hTextAlign="Center">
+			<text><![CDATA[Health Care]]></text>
+		</element>
+		<element kind="staticText" uuid="562f608d-5740-4011-9fd7-4a85eb7f269f" x="5" y="50" width="544" height="30" hTextAlign="Center">
+			<text><![CDATA[Main branch: Colombo road, Kurunegala
+HotLine: 077 1234567/ 077 1234568 / 077 1234569]]></text>
+		</element>
+	</title>
+	<pageHeader height="52" splitType="Stretch">
+		<element kind="staticText" uuid="03a15e6a-9e4d-4f2a-9a92-d831944e5914" x="5" y="25" width="85" height="20" bold="true">
+			<text><![CDATA[Date                   :]]></text>
+		</element>
+		<element kind="staticText" uuid="6c800d1d-be18-4383-901b-aba8d98d0031" x="5" y="5" width="85" height="20" bold="true">
+			<text><![CDATA[Invoice Number:]]></text>
+		</element>
+		<element kind="textField" uuid="67cc4592-7507-4a19-bedf-ec0cc59f81d6" x="90" y="5" width="100" height="20">
+			<expression><![CDATA[$P{invoice_num}]]></expression>
+		</element>
+		<element kind="textField" uuid="cadf9fef-a6c5-4f54-96a4-b00369f7f484" x="90" y="25" width="100" height="20">
+			<expression><![CDATA[$P{date}]]></expression>
+		</element>
+	</pageHeader>
+	<columnHeader height="21" splitType="Stretch">
+		<element kind="staticText" uuid="7b72ca55-3f34-4665-afdc-03762fb17519" mode="Opaque" x="20" y="1" width="90" height="19" forecolor="#FFFFFF" backcolor="#030303" bold="true" hTextAlign="Center">
+			<text><![CDATA[Id]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dfc47d54-c3ad-40e2-94a4-ccc791335dc6"/>
+		</element>
+		<element kind="staticText" uuid="6fae3bd8-0af7-4ef8-b050-96828017e8d1" mode="Opaque" x="110" y="1" width="110" height="19" forecolor="#FFFFFF" backcolor="#030303" bold="true" hTextAlign="Center">
+			<text><![CDATA[Patient First Name]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7554c968-f0a6-49aa-99f8-4aea8e64a4cc"/>
+		</element>
+		<element kind="staticText" uuid="5fbdf7f0-8b6b-4492-aa0a-753e331c0c58" mode="Opaque" x="220" y="1" width="110" height="19" forecolor="#FFFFFF" backcolor="#030303" bold="true" hTextAlign="Center">
+			<text><![CDATA[Patient Last Name]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8599a541-c482-4bc1-bff6-d67640e18ad1"/>
+		</element>
+		<element kind="staticText" uuid="132121bd-a172-43fb-9a9c-659e88a05592" mode="Opaque" x="330" y="1" width="110" height="19" forecolor="#FFFFFF" backcolor="#030303" bold="true" hTextAlign="Center">
+			<text><![CDATA[Total Amount]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="51bd7761-0dc3-4f6c-8235-6f0fffc8d54e"/>
+		</element>
+		<element kind="staticText" uuid="5dbf4929-08f5-4f81-b1a1-6d11f627979a" mode="Opaque" x="440" y="1" width="100" height="19" forecolor="#FFFFFF" backcolor="#030303" bold="true" hTextAlign="Center">
+			<text><![CDATA[Bill Status]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bf6a8860-db70-473c-a51a-9d2b45149385"/>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<element kind="textField" uuid="b4361166-5ab3-4d13-a1b2-0986b9c021d1" x="20" y="-1" width="90" height="21" hTextAlign="Center">
+				<expression><![CDATA[$F{COLUMN_0}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dfc47d54-c3ad-40e2-94a4-ccc791335dc6"/>
+			</element>
+			<element kind="textField" uuid="1d4577e7-d463-46bb-9ab5-a6e1d91af696" x="110" y="0" width="110" height="20" hTextAlign="Center">
+				<expression><![CDATA[$F{COLUMN_1}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7554c968-f0a6-49aa-99f8-4aea8e64a4cc"/>
+			</element>
+			<element kind="textField" uuid="b595c166-b4d3-4f35-8882-29962a7c488a" x="220" y="0" width="110" height="20" hTextAlign="Center">
+				<expression><![CDATA[$F{COLUMN_2}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8599a541-c482-4bc1-bff6-d67640e18ad1"/>
+			</element>
+			<element kind="textField" uuid="f253f9ee-3f90-40a6-8e1e-037c43970a24" x="330" y="0" width="110" height="21" hTextAlign="Center">
+				<expression><![CDATA[$F{COLUMN_3}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="51bd7761-0dc3-4f6c-8235-6f0fffc8d54e"/>
+			</element>
+			<element kind="textField" uuid="f315b716-f009-4c0c-838d-9d7c2e450c5f" x="440" y="0" width="100" height="20" hTextAlign="Center">
+				<expression><![CDATA[$F{COLUMN_6}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bf6a8860-db70-473c-a51a-9d2b45149385"/>
+			</element>
+		</band>
+	</detail>
+	<summary height="48" splitType="Stretch">
+		<element kind="staticText" uuid="2136340f-9761-436e-bc55-52743130912e" x="360" y="2" width="80" height="14" fontName="SansSerif" fontSize="10.0" bold="true" hTextAlign="Left">
+			<text><![CDATA[Total                 :]]></text>
+		</element>
+		<element kind="staticText" uuid="6164b96c-7514-450f-9484-4c91277a667b" x="360" y="16" width="80" height="14" fontName="SansSerif" fontSize="10.0" bold="true" hTextAlign="Left">
+			<text><![CDATA[Cash Received:]]></text>
+		</element>
+		<element kind="staticText" uuid="9a3bfcd1-867c-49b5-be80-15884b3df355" x="360" y="30" width="80" height="14" fontName="SansSerif" fontSize="10.0" bold="true" hTextAlign="Left">
+			<text><![CDATA[Balance            :]]></text>
+			<property name="com.jaspersoft.studio.unit.height" value="mm"/>
+		</element>
+		<element kind="textField" uuid="7731f594-35a1-4408-a96f-28eddb14b870" x="440" y="30" width="100" height="14" fontSize="10.0">
+			<expression><![CDATA[$P{balance}]]></expression>
+		</element>
+		<element kind="textField" uuid="337487c1-0ed1-4183-a9df-926df0c788fe" x="440" y="17" width="100" height="13" fontSize="10.0">
+			<expression><![CDATA[$P{paid}]]></expression>
+		</element>
+		<element kind="textField" uuid="c921a52b-d01b-4f73-8921-09bfa171d932" x="440" y="1" width="100" height="16" fontSize="10.0">
+			<expression><![CDATA[$P{total_amount}]]></expression>
+		</element>
+	</summary>
+</jasperReport>

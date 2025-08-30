@@ -5,7 +5,14 @@
 package view;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Vector;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import model.LogedUserBean;
+import model.MySQL;
 
 /**
  *
@@ -23,6 +30,8 @@ public class Dashboard extends javax.swing.JPanel {
         style();
         this.userBean = userBean;
         name_label.setText(userBean.getFname() + " " + userBean.getLname());
+        initCardData();
+        loadAppointments();
     }
 
     private void style() {
@@ -37,6 +46,87 @@ public class Dashboard extends javax.swing.JPanel {
 
     }
 
+    private void initCardData() {
+        try {
+            LocalDate today = LocalDate.now();
+            String date = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+            ResultSet rs1 = MySQL.execute("SELECT COUNT(*) AS total FROM `patients`");
+            rs1.next();
+            int x = rs1.getInt("total");
+
+            ResultSet rs2 = MySQL.execute("SELECT COUNT(*) AS total FROM `appointments` WHERE `appointment_date`='" + date + "'");
+            rs2.next();
+            int y = rs2.getInt("total");
+
+            ResultSet rs3 = MySQL.execute("SELECT COUNT(*) AS total FROM `staff`");
+            rs3.next();
+            int z = rs3.getInt("total");
+
+            ResultSet rs4 = MySQL.execute("SELECT COUNT(*) AS total FROM `insurance_claims` WHERE `claim_status_claim_status_id`='1'");
+            rs4.next();
+            int w = rs4.getInt("total");
+
+            patients_txt.setText(String.valueOf(x));
+            totalAppointmentlabel.setText(String.valueOf(y));
+            totalStaff.setText(String.valueOf(z));
+            jLabel8.setText(String.valueOf(w));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadAppointments() {
+        try {
+            // Build the SQL query with filters
+            StringBuilder query = new StringBuilder();
+            query.append("SELECT a.appointment_id, a.appointment_date, a.appointment_time, ");
+            query.append("a.patients_patient_id, a.staff_staff_id, s.appointment_status_name, ");
+            query.append("p.first_name AS patient_first_name, p.last_name AS patient_last_name, ");
+            query.append("st.first_name AS staff_first_name, st.last_name AS staff_last_name ");
+            query.append("FROM appointments a ");
+            query.append("INNER JOIN appointment_status s ON a.appointment_status_appointment_status_id = s.appointment_status_id ");
+            query.append("INNER JOIN patients p ON a.patients_patient_id = p.patient_id ");
+            query.append("INNER JOIN staff st ON a.staff_staff_id = st.staff_id ");
+            query.append("WHERE 1=1 ");
+
+           LocalDate today = LocalDate.now();
+            String tdate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+            if (!tdate.isEmpty()) {
+                query.append("AND a.appointment_date LIKE '").append(tdate).append("%' ");
+            }
+
+          
+            ResultSet resultSet = MySQL.execute(query.toString());
+
+            // Clear the table
+            DefaultTableModel model = (DefaultTableModel) dashboard_table.getModel();
+            model.setRowCount(0);
+
+            // Populate the table with results
+            while (resultSet != null && resultSet.next()) {
+                Vector<String> row = new Vector<>();
+                row.add(resultSet.getString("appointment_id"));
+                row.add(resultSet.getString("appointment_time"));
+                String patientName = resultSet.getString("patient_first_name") + " "
+                        + resultSet.getString("patient_last_name");
+                String staffName = resultSet.getString("staff_first_name") + " "
+                        + resultSet.getString("staff_last_name");
+                row.add(patientName);
+                row.add(staffName);
+                row.add(resultSet.getString("appointment_status_name"));
+
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading appointments: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -49,13 +139,13 @@ public class Dashboard extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         card1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        income_txt = new javax.swing.JLabel();
+        patients_txt = new javax.swing.JLabel();
         card2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        totalExpenseslabel = new javax.swing.JLabel();
+        totalAppointmentlabel = new javax.swing.JLabel();
         card3 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        totalNoPadiExpenseslabel = new javax.swing.JLabel();
+        totalStaff = new javax.swing.JLabel();
         card4 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -73,10 +163,10 @@ public class Dashboard extends javax.swing.JPanel {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Total Patients");
 
-        income_txt.setFont(new java.awt.Font("Poppins", 1, 20)); // NOI18N
-        income_txt.setForeground(new java.awt.Color(255, 255, 255));
-        income_txt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        income_txt.setText("10");
+        patients_txt.setFont(new java.awt.Font("Poppins", 1, 20)); // NOI18N
+        patients_txt.setForeground(new java.awt.Color(255, 255, 255));
+        patients_txt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        patients_txt.setText("10");
 
         javax.swing.GroupLayout card1Layout = new javax.swing.GroupLayout(card1);
         card1.setLayout(card1Layout);
@@ -87,7 +177,7 @@ public class Dashboard extends javax.swing.JPanel {
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
                     .addGroup(card1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(income_txt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(patients_txt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         card1Layout.setVerticalGroup(
@@ -96,7 +186,7 @@ public class Dashboard extends javax.swing.JPanel {
                 .addGap(24, 24, 24)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(income_txt, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(patients_txt, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(24, Short.MAX_VALUE))
         );
 
@@ -105,10 +195,10 @@ public class Dashboard extends javax.swing.JPanel {
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Today's Appointments");
 
-        totalExpenseslabel.setFont(new java.awt.Font("Poppins", 1, 20)); // NOI18N
-        totalExpenseslabel.setForeground(new java.awt.Color(255, 255, 255));
-        totalExpenseslabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        totalExpenseslabel.setText("10");
+        totalAppointmentlabel.setFont(new java.awt.Font("Poppins", 1, 20)); // NOI18N
+        totalAppointmentlabel.setForeground(new java.awt.Color(255, 255, 255));
+        totalAppointmentlabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        totalAppointmentlabel.setText("10");
 
         javax.swing.GroupLayout card2Layout = new javax.swing.GroupLayout(card2);
         card2.setLayout(card2Layout);
@@ -118,7 +208,7 @@ public class Dashboard extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(card2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
-                    .addComponent(totalExpenseslabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(totalAppointmentlabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         card2Layout.setVerticalGroup(
@@ -127,7 +217,7 @@ public class Dashboard extends javax.swing.JPanel {
                 .addGap(23, 23, 23)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(totalExpenseslabel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(totalAppointmentlabel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(25, Short.MAX_VALUE))
         );
 
@@ -136,10 +226,10 @@ public class Dashboard extends javax.swing.JPanel {
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("Total Staff");
 
-        totalNoPadiExpenseslabel.setFont(new java.awt.Font("Poppins", 1, 20)); // NOI18N
-        totalNoPadiExpenseslabel.setForeground(new java.awt.Color(255, 255, 255));
-        totalNoPadiExpenseslabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        totalNoPadiExpenseslabel.setText("10");
+        totalStaff.setFont(new java.awt.Font("Poppins", 1, 20)); // NOI18N
+        totalStaff.setForeground(new java.awt.Color(255, 255, 255));
+        totalStaff.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        totalStaff.setText("10");
 
         javax.swing.GroupLayout card3Layout = new javax.swing.GroupLayout(card3);
         card3.setLayout(card3Layout);
@@ -149,7 +239,7 @@ public class Dashboard extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(card3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
-                    .addComponent(totalNoPadiExpenseslabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(totalStaff, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         card3Layout.setVerticalGroup(
@@ -158,7 +248,7 @@ public class Dashboard extends javax.swing.JPanel {
                 .addGap(24, 24, 24)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(totalNoPadiExpenseslabel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(totalStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(24, Short.MAX_VALUE))
         );
 
@@ -299,7 +389,6 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JPanel card3;
     private javax.swing.JPanel card4;
     private javax.swing.JTable dashboard_table;
-    private javax.swing.JLabel income_txt;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -311,7 +400,8 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel name_label;
-    private javax.swing.JLabel totalExpenseslabel;
-    private javax.swing.JLabel totalNoPadiExpenseslabel;
+    private javax.swing.JLabel patients_txt;
+    private javax.swing.JLabel totalAppointmentlabel;
+    private javax.swing.JLabel totalStaff;
     // End of variables declaration//GEN-END:variables
 }

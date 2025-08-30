@@ -110,7 +110,7 @@
                           <Component id="jLabel1" alignment="0" pref="220" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="income_txt" max="32767" attributes="0"/>
+                              <Component id="patients_txt" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -123,7 +123,7 @@
                       <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="income_txt" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="patients_txt" min="-2" pref="29" max="-2" attributes="0"/>
                       <EmptySpace pref="24" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -142,7 +142,7 @@
                 <Property name="text" type="java.lang.String" value="Total Patients"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="income_txt">
+            <Component class="javax.swing.JLabel" name="patients_txt">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Poppins" size="20" style="1"/>
@@ -165,7 +165,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jLabel2" alignment="0" pref="220" max="32767" attributes="0"/>
-                          <Component id="totalExpenseslabel" alignment="0" max="32767" attributes="0"/>
+                          <Component id="totalAppointmentlabel" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -177,7 +177,7 @@
                       <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="totalExpenseslabel" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="totalAppointmentlabel" min="-2" pref="29" max="-2" attributes="0"/>
                       <EmptySpace pref="25" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -196,7 +196,7 @@
                 <Property name="text" type="java.lang.String" value="Today&apos;s Appointments"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="totalExpenseslabel">
+            <Component class="javax.swing.JLabel" name="totalAppointmentlabel">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Poppins" size="20" style="1"/>
@@ -219,7 +219,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jLabel3" alignment="0" pref="225" max="32767" attributes="0"/>
-                          <Component id="totalNoPadiExpenseslabel" alignment="0" max="32767" attributes="0"/>
+                          <Component id="totalStaff" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -231,7 +231,7 @@
                       <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="totalNoPadiExpenseslabel" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="totalStaff" min="-2" pref="29" max="-2" attributes="0"/>
                       <EmptySpace pref="24" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -250,7 +250,7 @@
                 <Property name="text" type="java.lang.String" value="Total Staff"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="totalNoPadiExpenseslabel">
+            <Component class="javax.swing.JLabel" name="totalStaff">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Poppins" size="20" style="1"/>
